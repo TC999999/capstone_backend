@@ -1,0 +1,32 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "http://example.com/example.json",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 60
+    },
+    "initialPrice": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 20
+    },
+    "condition": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 30
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100
+    },
+    "isSold": {
+      "type": "boolean"
+    }
+  },
+  "additionalProperties": false,
+  "required": []
+}
