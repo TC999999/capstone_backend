@@ -123,6 +123,15 @@ class Item {
     return types;
   }
 
+  static async getItemSeller(id) {
+    const results = await db.query(
+      `SELECT seller_username AS "sellerUser" FROM items WHERE id=$1`,
+      [id]
+    );
+    const sellerUser = results.rows[0];
+    return sellerUser;
+  }
+
   static async findItemTypes(id) {
     const results = await db.query(
       `SELECT t.id, t.name FROM item_types AS t JOIN items_to_types AS it ON t.id = it.type_id 
@@ -172,6 +181,7 @@ class Item {
       condition: "condition",
       description: "description",
       initialPrice: "initial_price",
+      isSold: "is_sold",
     });
 
     const idIdx = "$" + (values.length + 1);
@@ -204,17 +214,6 @@ class Item {
     const item = result.rows[0];
 
     if (!item) throw new NotFoundError(`No item: ${id}`);
-  }
-
-  static async getMaxItemID() {
-    const result = await db.query(`
-      SELECT
-        MAX(id)
-      FROM 
-        items`);
-
-    const max = result.rows[0];
-    return max;
   }
 }
 

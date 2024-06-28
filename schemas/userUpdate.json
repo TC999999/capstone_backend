@@ -39,7 +39,7 @@
       "minLength": 2,
       "maxLength": 60
     },
-    "region_or_state": {
+    "regionOrState": {
       "type": "string",
       "minLength": 2,
       "maxLength": 60
@@ -50,14 +50,10 @@
       "maxLength": 60
     },
     "latitude": {
-      "type": "string",
-      "minLength": 2,
-      "maxLength": 60
+      "type": "number"
     },
     "longitude": {
-      "type": "string",
-      "minLength": 2,
-      "maxLength": 60
+      "type": "number"
     }
   },
   "additionalProperties": false,

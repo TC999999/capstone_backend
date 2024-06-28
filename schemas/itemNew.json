@@ -8,7 +8,7 @@
       "minLength": 1,
       "maxLength": 60
     },
-    "imagePath": {
+    "imageName": {
       "type": "string"
     },
     "initialPrice": {

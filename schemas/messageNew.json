@@ -4,9 +4,7 @@
   "type": "object",
   "properties": {
     "body": {
-      "type": "string",
-      "minLength": 6,
-      "maxLength": 60
+      "type": "string"
     }
   },
   "additionalProperties": false,

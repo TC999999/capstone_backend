@@ -3,6 +3,9 @@
   "$id": "http://example.com/example.json",
   "type": "object",
   "properties": {
+    "reviewedUsername": {
+      "type": "string"
+    },
     "rating": {
       "type": "integer",
       "minimum": 1,

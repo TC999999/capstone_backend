@@ -172,7 +172,7 @@ router.post(
       if (res.locals.user.username === req.params.buyerUsername) {
         throw new BadRequestError("Can't sell an item to yourself!");
       }
-      if (res.locals.user.username !== item.sellerUsername) {
+      if (res.locals.user.username !== item.sellerUser) {
         throw new BadRequestError(
           "Can't sell an item that doesn't belong to you!"
         );

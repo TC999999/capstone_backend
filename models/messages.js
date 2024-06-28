@@ -91,7 +91,8 @@ class Message {
                 m.sent_at
           FROM messages AS m
             JOIN items AS i on m.item_id = i.id
-          WHERE m.item_id = $1 AND m.from_username = $2 AND m.to_username = $3`,
+          WHERE m.item_id = $1 AND m.from_username = $2 AND m.to_username = $3
+          ORDER BY m.id DESC`,
       [itemID, userOne, userTwo]
     );
 
@@ -107,7 +108,8 @@ class Message {
                 m.sent_at
           FROM messages AS m
             JOIN items AS i on m.item_id = i.id
-          WHERE m.item_id = $1 AND m.to_username = $2 AND m.from_username = $3`,
+          WHERE m.item_id = $1 AND m.to_username = $2 AND m.from_username = $3
+          ORDER BY m.id DESC`,
       [itemID, userOne, userTwo]
     );
 

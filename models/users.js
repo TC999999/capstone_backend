@@ -145,6 +145,19 @@ class User {
     return users;
   }
 
+  static async findOtherUsernames(username) {
+    const result = await db.query(
+      `SELECT username
+           FROM users
+           WHERE username!=$1
+           ORDER BY username`,
+      [username]
+    );
+    let users = result.rows;
+
+    return users;
+  }
+
   static async get(username) {
     const userRes = await db.query(
       `SELECT username,
@@ -294,27 +307,33 @@ class User {
       [username]
     );
     return items.rows;
-    // let idArr = items.rows.map((val) => {
-    //   return val.itemID;
-    // });
-    // return idArr;
   }
 
   static async getMessages(username) {
-    let messages = await db.query(
+    let results = await db.query(
       `
         SELECT 
-        id as "messageID"
+        m.id AS "messageID",
+        m.from_username AS "from",
+        m.to_username AS "to",
+        m.item_id AS "itemID",
+        i.name AS "itemName",
+        m.sent_at AS "createdAt"
         FROM
-        messages
+        messages AS m
+        JOIN
+        items AS i
+        ON
+        m.item_id = i.id
         WHERE
-        to_username=$1`,
+        to_username=$1
+        ORDER BY
+        m.id
+        DESC`,
       [username]
     );
-    let idArr = messages.rows.map((val) => {
-      return val.messageID;
-    });
-    return idArr;
+    let messages = results.rows;
+    return messages;
   }
 
   static async getReviews(username) {
@@ -333,10 +352,6 @@ class User {
       [username]
     );
     return reviews.rows;
-    // let idArr = reviews.rows.map((val) => {
-    //   return val.reviewID;
-    // });
-    // return idArr;
   }
 
   static async getReports(username) {
@@ -381,8 +396,6 @@ class User {
         ORDER BY
             count
         DESC
-        LIMIT 
-            5
         `,
       [username]
     );
@@ -433,9 +446,6 @@ class User {
         ORDER BY 
             count 
         DESC
-        LIMIT
-            10
-        
         `,
       [username]
     );

@@ -9,9 +9,8 @@
       "maxLength": 60
     },
     "initialPrice": {
-      "type": "string",
-      "minLength": 1,
-      "maxLength": 20
+      "type": "number",
+      "min": 1
     },
     "condition": {
       "type": "string",

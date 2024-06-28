@@ -55,14 +55,10 @@
       "maxLength": 60
     },
     "latitude": {
-      "type": "string",
-      "minLength": 2,
-      "maxLength": 60
+      "type": "number"
     },
     "longitude": {
-      "type": "string",
-      "minLength": 2,
-      "maxLength": 60
+      "type": "number"
     },
     "isAdmin": {
       "type": "boolean"

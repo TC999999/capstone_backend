@@ -2,8 +2,12 @@
 
 const jsonschema = require("jsonschema");
 const express = require("express");
+const multer = require("multer");
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
 const { supabase } = require("../config");
+const { decode } = require("base64-arraybuffer");
 
 const { BadRequestError } = require("../expressError");
 const {
@@ -17,40 +21,58 @@ const updateItemSchema = require("../schemas/itemUpdate.json");
 
 const router = new express.Router();
 
-router.post("/", ensureLoggedIn, async (req, res, next) => {
-  try {
-    const validator = jsonschema.validate({ ...req.body }, newItemSchema);
-    if (!validator.valid) {
-      const errs = validator.errors.map((e) => e.stack);
-      throw new BadRequestError(errs);
+router.post(
+  "/",
+  [ensureLoggedIn, upload.single("imageFile")],
+  async (req, res, next) => {
+    try {
+      req.body.initialPrice = parseInt(req.body.initialPrice);
+      const validator = jsonschema.validate({ ...req.body }, newItemSchema);
+      if (!validator.valid) {
+        const errs = validator.errors.map((e) => e.stack);
+        throw new BadRequestError(errs);
+      }
+      const {
+        name,
+        initialPrice,
+        imageName,
+        condition,
+        description,
+        typeIDArr,
+      } = req.body;
+
+      const fileBase64 = decode(req.file.buffer.toString("base64"));
+
+      await supabase.storage
+        .from("images")
+        .upload(`public/${imageName}`, fileBase64, {
+          cacheControl: "3600",
+          upsert: false,
+          contentType: req.file.mimetype,
+        });
+
+      let { data } = supabase.storage
+        .from("images")
+        .getPublicUrl(`public/${imageName}`);
+      let publicImageUrl = data.publicUrl;
+
+      const item = await Item.create({
+        name,
+        imageURL: publicImageUrl,
+        initialPrice,
+        condition,
+        description,
+        sellerUsername: res.locals.user.username,
+        isSold: false,
+      });
+
+      await Item.addItemToTypes(item.id, typeIDArr);
+      return res.status(201).json({ item });
+    } catch (err) {
+      return next(err);
     }
-    const { name, initialPrice, imagePath, condition, description, typeIDArr } =
-      req.body;
-
-    console.log(req.body);
-    let publicImageUrl = null;
-
-    if (imagePath) {
-      console.log(imagePath);
-      let { data } = supabase.storage.from("images").getPublicUrl(imagePath);
-      publicImageUrl = data.publicUrl;
-    }
-    const item = await Item.create({
-      name,
-      imageURL: publicImageUrl,
-      initialPrice,
-      condition,
-      description,
-      sellerUsername: res.locals.user.username,
-      isSold: false,
-    });
-
-    await Item.addItemToTypes(item.id, typeIDArr);
-    return res.status(201).json({ item });
-  } catch (err) {
-    return next(err);
   }
-});
+);
 
 router.get("/", ensureLoggedIn, async (req, res, next) => {
   try {
@@ -65,6 +87,15 @@ router.get("/:id", ensureLoggedIn, async (req, res, next) => {
   try {
     const item = await Item.findById(req.params.id);
     return res.json({ item });
+  } catch (err) {
+    return next(err);
+  }
+});
+
+router.get("/:id/seller", ensureLoggedIn, async (req, res, next) => {
+  try {
+    const seller = await Item.getItemSeller(req.params.id);
+    return res.json(seller);
   } catch (err) {
     return next(err);
   }
