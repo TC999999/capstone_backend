@@ -13,10 +13,8 @@ function getDatabaseUri() {
 
 const BCRYPT_WORK_FACTOR = process.env.NODE_ENV === "test" ? 1 : 12;
 
-const supabaseUrl = "https://iwyxashrshpdwjrvnnth.supabase.co";
-const supabaseKey =
-  process.env.SUPABASE_KEY ||
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml3eXhhc2hyc2hwZHdqcnZubnRoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTg2MzQzNzcsImV4cCI6MjAzNDIxMDM3N30.GLEozH0OEJlfWikBWFr3mIclOhNHDSNZ0yKr9l-eFuc";
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 module.exports = {

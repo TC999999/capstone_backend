@@ -1,5 +1,6 @@
 const db = require("../db");
 const { NotFoundError, BadRequestError } = require("../expressError");
+const User = require("./users");
 
 class Review {
   static async create({ reviewerUsername, reviewedUsername, rating, body }) {
@@ -15,6 +16,30 @@ class Review {
     if (dupCheck) {
       throw new BadRequestError("You have already given this user a review");
     }
+
+    const purchaseCheckRes = await db.query(
+      `
+      SELECT 
+        p.username,
+        i.seller_username
+      FROM
+        purchases AS p
+      JOIN
+        items AS i
+      ON
+        p.item_id = i.id
+      WHERE 
+        p.username=$1
+      AND
+        i.seller_username=$2`,
+      [reviewerUsername, reviewedUsername]
+    );
+
+    let purchaseCheck = purchaseCheckRes.rows[0];
+    if (!purchaseCheck) {
+      throw new BadRequestError("You have not been sold anything by this user");
+    }
+
     const result = await db.query(
       `INSERT INTO reviews (
                     reviewer_username,

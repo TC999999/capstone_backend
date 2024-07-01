@@ -64,15 +64,17 @@ class Item {
     });
     const searchStr = `
     SELECT
-        id,
-        name,
-        image_url AS "imageURL",
-        initial_price AS "initialPrice",
-        condition,
-        description,
-        seller_username as "sellerUser"
-    FROM items
-    WHERE ${searchQuery} is_sold = false`;
+        i.id,
+        i.name,
+        i.image_url AS "imageURL",
+        i.initial_price AS "initialPrice",
+        i.condition,
+        i.description,
+        i.seller_username as "sellerUser"
+    FROM items AS i
+    JOIN users AS u
+    ON i.seller_username=u.username
+    WHERE ${searchQuery} i.is_sold = false AND u.is_flagged = false`;
 
     const results = await db.query(searchStr, values);
 

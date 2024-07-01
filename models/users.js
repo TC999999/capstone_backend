@@ -185,10 +185,12 @@ class User {
     const items = await User.getItems(username);
     const pastPurchases = await User.getPurchasedItems(username);
     const reviews = await User.getReviews(username);
+    const reports = await User.getReports(username);
 
     user.items = items;
     user.pastPurchases = pastPurchases;
     user.reviews = reviews;
+    user.reports = reports;
 
     return user;
   }
@@ -270,25 +272,50 @@ class User {
     return purchase;
   }
 
+  //   static async getPurchasedItems(username) {
+  //     let purchases = await db.query(
+  //       `
+  //         SELECT
+  //             i.id AS "ItemID"
+  //         FROM
+  //             users AS u
+  //         JOIN
+  //             purchases AS p ON u.username = p.username
+  //         JOIN
+  //             items AS i ON p.item_id = i.id
+  //         WHERE
+  //             u.username=$1`,
+  //       [username]
+  //     );
+  //     let idArr = purchases.rows.map((val) => {
+  //       return val.ItemID;
+  //     });
+  //     return idArr;
+  //   }
+
   static async getPurchasedItems(username) {
-    let purchases = await db.query(
+    let results = await db.query(
       `
         SELECT 
-            i.id AS "ItemID"
+            p.id AS "purchaseID",
+            i.seller_username AS "sellerUser",
+            i.name AS "itemName",
+            i.image_url AS "imageURL",
+            i.initial_price AS "price",
+            u.is_flagged AS "fromFlaggedUser"
         FROM
-            users AS u
-        JOIN 
-            purchases AS p ON u.username = p.username
-        JOIN 
+            purchases AS p
+         JOIN 
             items AS i ON p.item_id = i.id
+        JOIN 
+            users AS u ON i.seller_username = u.username 
+       
         WHERE
-            u.username=$1`,
+            p.username=$1`,
       [username]
     );
-    let idArr = purchases.rows.map((val) => {
-      return val.ItemID;
-    });
-    return idArr;
+    let purchases = results.rows;
+    return purchases;
   }
 
   static async getItems(username) {
@@ -355,20 +382,19 @@ class User {
   }
 
   static async getReports(username) {
-    let reports = await db.query(
+    let results = await db.query(
       `
         SELECT 
-        id as "reportID"
+        id as "reportID",
+        reporter_username as "reporter"
         FROM
         reports
         WHERE
         reported_username=$1`,
       [username]
     );
-    let idArr = reports.rows.map((val) => {
-      return val.reportID;
-    });
-    return idArr;
+    let reports = results.rows;
+    return reports;
   }
 
   static async getPastPurchasesTypes(username) {
@@ -435,10 +461,16 @@ class User {
             item_types AS t 
         ON 
             it.type_id=t.id 
+        JOIN 
+            users AS u
+        ON
+            i.seller_username=u.username
         WHERE 
             i.is_sold=false 
         AND
             i.seller_username!=$1
+        AND
+            u.is_flagged=false
         AND 
             (${selectTypeString}) 
         GROUP BY 
@@ -485,14 +517,14 @@ class User {
             i.is_sold = false
         AND
             i.seller_username!=$1
+        AND
+            u.is_flagged = false
         AND (
             u.zip_code = $2
         OR  
             (u.city = $3 AND u.region_or_state=$4)  
         OR 
-            u.region_or_state=$4 )
-        LIMIT 
-            10`,
+            u.region_or_state=$4 )`,
       [userName, zipCode, city, regionOrState]
     );
     let itemsInLocation = results.rows;

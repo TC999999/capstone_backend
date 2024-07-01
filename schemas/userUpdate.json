@@ -54,6 +54,12 @@
     },
     "longitude": {
       "type": "number"
+    },
+    "isAdmin": {
+      "type": "boolean"
+    },
+    "isFlagged": {
+      "type": "boolean"
     }
   },
   "additionalProperties": false,

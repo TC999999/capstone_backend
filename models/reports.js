@@ -29,7 +29,8 @@ class Report {
             reported_username AS "reportedUser",
             body,
             made_at AS "madeAt"
-      FROM reports`
+      FROM reports
+      ORDER BY id DESC`
     );
 
     let reports = result.rows;

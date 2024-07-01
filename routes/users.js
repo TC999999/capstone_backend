@@ -40,6 +40,15 @@ router.get("/", ensureLoggedIn, async function (req, res, next) {
   }
 });
 
+router.get("/get/current", ensureLoggedIn, async function (req, res, next) {
+  try {
+    const user = await User.get(res.locals.user.username);
+    return res.json({ user });
+  } catch (err) {
+    return next(err);
+  }
+});
+
 router.get("/:username", ensureLoggedIn, async function (req, res, next) {
   try {
     const user = await User.get(req.params.username);

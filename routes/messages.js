@@ -2,7 +2,11 @@ const jsonschema = require("jsonschema");
 
 const express = require("express");
 const router = new express.Router();
-const { ensureLoggedIn, ensureCorrectUsers } = require("../middleware/auth");
+const {
+  ensureLoggedIn,
+  ensureCorrectUsers,
+  ensureAdmin,
+} = require("../middleware/auth");
 const Message = require("../models/messages");
 const Item = require("../models/items");
 const User = require("../models/users");
@@ -32,6 +36,22 @@ router.get(
     try {
       const conversation = await Message.getConversation(
         req.params.itemID,
+        req.params.userOne,
+        req.params.userTwo
+      );
+      return res.json(conversation);
+    } catch (err) {
+      return next(err);
+    }
+  }
+);
+
+router.get(
+  "/users/:userOne/and/:userTwo",
+  ensureAdmin,
+  async (req, res, next) => {
+    try {
+      const conversation = await Message.getMessagesBetween(
         req.params.userOne,
         req.params.userTwo
       );

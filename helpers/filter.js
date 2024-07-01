@@ -24,11 +24,6 @@ function sqlForFilter(query, jsToSQL) {
     query.condition = `%${query.condition}%`;
   }
 
-  // adds percent characters to query.type to use for ILIKE in the SQL query
-  // if(filteredArr.includes("type")){
-  //   query.type=`%${query.type}%`
-  // }
-
   // if the filtered query is empty, return an empty string and values array
   if (filteredArr.length === 0) {
     return { searchQuery: "", values: [] };

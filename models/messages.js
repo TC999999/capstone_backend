@@ -119,6 +119,46 @@ class Message {
 
     return { conversation };
   }
+
+  static async getMessagesBetween(userOne, userTwo) {
+    const fromMessages = await db.query(
+      `SELECT 
+                m.id,
+                m.from_username,
+                m.to_username,
+                i.name AS item_name,
+                m.body,
+                m.sent_at
+          FROM messages AS m
+            JOIN items AS i on m.item_id = i.id
+          WHERE m.from_username = $1 AND m.to_username = $2
+          ORDER BY m.id DESC`,
+      [userOne, userTwo]
+    );
+
+    let from_buyer = fromMessages.rows;
+
+    const toMessages = await db.query(
+      `SELECT 
+                m.id,
+                m.from_username,
+                m.to_username,
+                i.name AS item_name,
+                m.body,
+                m.sent_at
+          FROM messages AS m
+            JOIN items AS i on m.item_id = i.id
+          WHERE m.to_username = $1 AND m.from_username = $2
+          ORDER BY m.id DESC`,
+      [userOne, userTwo]
+    );
+
+    let to_buyer = toMessages.rows;
+
+    let messages = merge(from_buyer, to_buyer);
+
+    return { messages };
+  }
 }
 
 module.exports = Message;
