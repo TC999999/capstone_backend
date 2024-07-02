@@ -44,7 +44,10 @@ CREATE TABLE items(
 CREATE TABLE purchases(
     id SERIAL PRIMARY KEY,
     item_id INTEGER NOT NULL UNIQUE REFERENCES items,
-    username TEXT NOT NULL REFERENCES users
+    username TEXT NOT NULL REFERENCES users,
+    final_price INTEGER CHECK (final_price >= 0) NOT NULL,
+    exchange_method TEXT NOT NULL,
+    sale_made timestamp with time zone NOT NULL
 );
 
 CREATE TABLE item_types(
@@ -81,7 +84,9 @@ CREATE TABLE reports(
     reported_username TEXT NOT NULL REFERENCES users,
     reporter_username TEXT NOT NULL REFERENCES users,
     body TEXT NOT NULL,
-    made_at timestamp with time zone NOT NULL
+    made_at timestamp with time zone NOT NULL,
+    is_cleared BOOLEAN NOT NULL DEFAULT FALSE
+
 );
 
 INSERT INTO users 
@@ -91,8 +96,11 @@ VALUES
 ('testuser', '$2b$12$EGmCkmgZsSh38Of610hVUuamBaEgfnXLOR6/SIQTCkrVd8soAOb0y', 'test', 'user',
 'testuser@gmail.com', '4444 Main Street', '12345', 'Little Rock', 'Arkansas', 'United States of America', '34.74648', '-92.28959',
 FALSE, FALSE),
+('testuser2', '$2b$12$EGmCkmgZsSh38Of610hVUuamBaEgfnXLOR6/SIQTCkrVd8soAOb0y', 'test2', 'user',
+'testuser2@gmail.com', '4442 Main Street', '12345', 'Little Rock', 'Arkansas', 'United States of America', '34.74648', '-92.28959',
+FALSE, FALSE),
 ('testadmin', '$2b$12$EGmCkmgZsSh38Of610hVUuamBaEgfnXLOR6/SIQTCkrVd8soAOb0y', 'test', 'admin',
-'testadmin@gmail.com', '4445 Main Street', '12345', 'Little Rock', 'Arkansas', 'United States of America', '34.74648', '-92.28959',
+'testadmin@gmail.com', '4445 Main Street', '12345', 'Los Angeles', 'California', 'United States of America', '34.74648', '-92.28959',
 TRUE, FALSE),
 ('flaggeduser', '$2b$12$EGmCkmgZsSh38Of610hVUuamBaEgfnXLOR6/SIQTCkrVd8soAOb0y', 'flagged', 'user',
 'flaggeduser@gmail.com', '4446 Main Street', '12345', 'Little Rock', 'Arkansas', 'United States of America', '34.74648', '-92.28959',

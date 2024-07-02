@@ -21,16 +21,28 @@ class Report {
     return result.rows[0];
   }
 
-  static async getAll() {
+  static async getAll(username) {
     const result = await db.query(
       `SELECT 
-            id,  
-            reporter_username AS "reporterUser",
-            reported_username AS "reportedUser",
-            body,
-            made_at AS "madeAt"
-      FROM reports
-      ORDER BY id DESC`
+            r.id,  
+            r.reporter_username AS "reporterUser",
+            r.reported_username AS "reportedUser",
+            r.body,
+            r.made_at AS "madeAt",
+            r.is_cleared AS "isCleared"
+      FROM reports AS r
+      JOIN users AS u
+      ON r.reported_username = u.username
+      WHERE
+        r.reporter_username!=$1
+      AND
+        r.reported_username!=$1
+      AND
+        r.is_cleared=false
+      AND
+        u.is_flagged=false
+      ORDER BY r.id DESC`,
+      [username]
     );
 
     let reports = result.rows;
@@ -44,7 +56,8 @@ class Report {
             reporter_username AS "reporterUser",
             reported_username AS "reportedUser",
             body,
-            made_at AS "madeAt"
+            made_at AS "madeAt",
+            is_cleared AS "isCleared"
       FROM reports
       WHERE id = $1`,
       [id]
@@ -57,6 +70,18 @@ class Report {
     }
 
     return { report };
+  }
+
+  static async clearReport(id) {
+    const result = await db.query(
+      `UPDATE reports SET is_cleared=true WHERE id=$1 RETURNING reported_username, reporter_username, body, made_at, is_cleared`,
+      [id]
+    );
+
+    const report = result.rows[0];
+
+    if (!report) throw new NotFoundError(`No user: ${id}`);
+    return report;
   }
 }
 

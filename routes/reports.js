@@ -10,7 +10,8 @@ const newReportSchema = require("../schemas/reportNew.json");
 
 router.get("/", ensureAdmin, async (req, res, next) => {
   try {
-    const reports = await Report.getAll();
+    const { username } = req.query;
+    const reports = await Report.getAll(username);
     return res.json(reports);
   } catch (err) {
     return next(err);
@@ -43,6 +44,18 @@ router.post("/", ensureLoggedIn, async (req, res, next) => {
       body,
     });
     return res.status(201).json(report);
+  } catch (err) {
+    return next(err);
+  }
+});
+
+router.patch("/clear/:id", ensureAdmin, async (req, res, next) => {
+  try {
+    const report = await Report.clearReport(req.params.id);
+    if (report) {
+      return res.json(report);
+    }
+    throw new UnauthorizedError();
   } catch (err) {
     return next(err);
   }

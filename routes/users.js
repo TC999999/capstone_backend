@@ -181,29 +181,27 @@ router.get(
   }
 );
 
-router.post(
-  "/sellto/:buyerUsername/item/:itemID",
-  ensureLoggedIn,
-  async function (req, res, next) {
-    try {
-      const item = await Item.findById(req.params.itemID);
-      if (res.locals.user.username === req.params.buyerUsername) {
-        throw new BadRequestError("Can't sell an item to yourself!");
-      }
-      if (res.locals.user.username !== item.sellerUser) {
-        throw new BadRequestError(
-          "Can't sell an item that doesn't belong to you!"
-        );
-      }
-      const purchase = await User.makeSale(
-        req.params.buyerUsername,
-        req.params.itemID
-      );
-      return res.json({ purchase });
-    } catch (err) {
-      return next(err);
+router.post("/items/sale", ensureLoggedIn, async function (req, res, next) {
+  try {
+    const item = await Item.findById(req.body.itemID);
+    if (res.locals.user.username === req.body.buyerUsername) {
+      throw new BadRequestError("Can't sell an item to yourself!");
     }
+    if (res.locals.user.username !== item.sellerUser) {
+      throw new BadRequestError(
+        "Can't sell an item that doesn't belong to you!"
+      );
+    }
+    const purchase = await User.makeSale(
+      req.body.itemID,
+      req.body.buyerUsername,
+      req.body.finalPrice,
+      req.body.exchangeMethod
+    );
+    return res.json({ purchase });
+  } catch (err) {
+    return next(err);
   }
-);
+});
 
 module.exports = router;

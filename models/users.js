@@ -31,6 +31,10 @@ class User {
 
     const user = result.rows[0];
 
+    if (user.isFlagged) {
+      throw new UnauthorizedError("THIS ACCOUNT HAS BEEN FLAGGED!");
+    }
+
     if (user) {
       // compare hashed password to a new hash from password
       const isValid = await bcrypt.compare(password, user.password);
@@ -252,7 +256,7 @@ class User {
     if (!user) throw new NotFoundError(`No user: ${username}`);
   }
 
-  static async makeSale(username, itemID) {
+  static async makeSale(itemID, username, finalPrice, exchangeMethod) {
     let soldCheckRes = await db.query(
       `SELECT is_sold AS "isSold" FROM items WHERE id=$1`,
       [itemID]
@@ -264,44 +268,24 @@ class User {
 
     await db.query(`UPDATE items SET is_sold = true WHERE id=$1`, [itemID]);
     let result = await db.query(
-      `INSERT INTO purchases (item_id, username) VALUES ($1, $2) RETURNING username, item_id AS itemID`,
-      [itemID, username]
+      `INSERT INTO purchases (item_id, username, final_price, exchange_method, sale_made) VALUES ($1, $2, $3, $4, current_timestamp) RETURNING username, item_id AS itemID`,
+      [itemID, username, finalPrice, exchangeMethod]
     );
     const purchase = result.rows[0];
     purchase.message = "success";
     return purchase;
   }
 
-  //   static async getPurchasedItems(username) {
-  //     let purchases = await db.query(
-  //       `
-  //         SELECT
-  //             i.id AS "ItemID"
-  //         FROM
-  //             users AS u
-  //         JOIN
-  //             purchases AS p ON u.username = p.username
-  //         JOIN
-  //             items AS i ON p.item_id = i.id
-  //         WHERE
-  //             u.username=$1`,
-  //       [username]
-  //     );
-  //     let idArr = purchases.rows.map((val) => {
-  //       return val.ItemID;
-  //     });
-  //     return idArr;
-  //   }
-
   static async getPurchasedItems(username) {
     let results = await db.query(
       `
         SELECT 
             p.id AS "purchaseID",
+            p.final_price AS "price",
+            p.sale_made AS "soldAt",
             i.seller_username AS "sellerUser",
             i.name AS "itemName",
             i.image_url AS "imageURL",
-            i.initial_price AS "price",
             u.is_flagged AS "fromFlaggedUser"
         FROM
             purchases AS p
@@ -390,7 +374,9 @@ class User {
         FROM
         reports
         WHERE
-        reported_username=$1`,
+        reported_username=$1
+        AND
+        is_cleared=false`,
       [username]
     );
     let reports = results.rows;
