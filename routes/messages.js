@@ -11,6 +11,8 @@ const Message = require("../models/messages");
 const Item = require("../models/items");
 const User = require("../models/users");
 const { UnauthorizedError, BadRequestError } = require("../expressError");
+const emailjs = require("@emailjs/nodejs");
+const { serviceID, templateID, publicKey, privateKey } = require("../config");
 
 const newMessageSchema = require("../schemas/messageNew.json");
 
@@ -67,6 +69,7 @@ router.post(
   ensureLoggedIn,
   async (req, res, next) => {
     try {
+      await User.get(req.params.toUser);
       const item = await Item.findById(req.params.itemID);
       if (
         req.params.toUser !== item.sellerUser &&
@@ -79,7 +82,7 @@ router.post(
       if (req.params.toUser === res.locals.user.username) {
         throw new BadRequestError("Cannot message yourself");
       }
-      await User.get(req.params.toUser);
+
       const validator = jsonschema.validate(req.body, newMessageSchema);
       if (!validator.valid) {
         const errs = validator.errors.map((e) => e.stack);
@@ -99,5 +102,23 @@ router.post(
     }
   }
 );
+
+router.post("/notifications", ensureLoggedIn, async (req, res, next) => {
+  try {
+    let templateParams = req.body;
+    const keys = { publicKey, privateKey };
+    const response = await emailjs.send(
+      serviceID,
+      templateID,
+      templateParams,
+      keys
+    );
+    console.log(response);
+    return res.status(201).json({ notification: "sent!" });
+  } catch (err) {
+    console.log(err);
+    return next(err);
+  }
+});
 
 module.exports = router;

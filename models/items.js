@@ -119,6 +119,22 @@ class Item {
     return item;
   }
 
+  static async findItemName(id) {
+    const results = await db.query(
+      `SELECT 
+            i.name
+        FROM
+            items AS i
+        WHERE 
+            id=$1`,
+      [id]
+    );
+    const item = results.rows[0];
+    if (!item) throw new NotFoundError(`No item: ${id}`);
+
+    return item;
+  }
+
   static async getItemTypes() {
     const results = await db.query(`SELECT * FROM item_types`);
     const types = results.rows;

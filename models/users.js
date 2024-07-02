@@ -145,17 +145,17 @@ class User {
     return users;
   }
 
-  static async findOtherUsernames(username) {
+  static async getEmail(username) {
     const result = await db.query(
-      `SELECT username
+      `SELECT email
            FROM users
-           WHERE username!=$1
-           ORDER BY username`,
+           WHERE username=$1
+        `,
       [username]
     );
-    let users = result.rows;
+    let email = result.rows[0];
 
-    return users;
+    return email;
   }
 
   static async get(username) {

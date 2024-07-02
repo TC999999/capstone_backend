@@ -92,6 +92,15 @@ router.get("/:id", ensureLoggedIn, async (req, res, next) => {
   }
 });
 
+router.get("/getname/:id", ensureLoggedIn, async (req, res, next) => {
+  try {
+    const item = await Item.findItemName(req.params.id);
+    return res.json({ item });
+  } catch (err) {
+    return next(err);
+  }
+});
+
 router.get("/:id/seller", ensureLoggedIn, async (req, res, next) => {
   try {
     const seller = await Item.getItemSeller(req.params.id);

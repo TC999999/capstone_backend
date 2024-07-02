@@ -17,10 +17,19 @@ const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
+const serviceID = process.env.SERVICE_ID;
+const templateID = process.env.TEMPLATE_ID;
+const publicKey = process.env.PUBLIC_KEY;
+const privateKey = process.env.PRIVATE_KEY;
+
 module.exports = {
   SECRET_KEY,
   PORT,
   BCRYPT_WORK_FACTOR,
   getDatabaseUri,
   supabase,
+  serviceID,
+  templateID,
+  publicKey,
+  privateKey,
 };
