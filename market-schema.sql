@@ -14,7 +14,7 @@ DROP TABLE IF EXISTS reviews;
 DROP TABLE IF EXISTS reports;
 
 CREATE TABLE users(
-    username TEXT NOT NULL PRIMARY KEY,
+    username TEXT NOT NULL UNIQUE PRIMARY KEY,
     password TEXT NOT NULL,
     first_name TEXT NOT NULL,
     last_name TEXT NOT NULL,
