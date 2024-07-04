@@ -12,7 +12,7 @@ const Item = require("../models/items");
 const User = require("../models/users");
 const { UnauthorizedError, BadRequestError } = require("../expressError");
 const emailjs = require("@emailjs/nodejs");
-const { serviceID, templateID, publicKey, privateKey } = require("../config");
+const { serviceID, publicKey, privateKey } = require("../config");
 
 const newMessageSchema = require("../schemas/messageNew.json");
 
@@ -71,6 +71,9 @@ router.post(
     try {
       await User.get(req.params.toUser);
       const item = await Item.findById(req.params.itemID);
+      if (item.isSold) {
+        throw new BadRequestError("This item has already been sold!");
+      }
       if (
         req.params.toUser !== item.sellerUser &&
         res.locals.user.username !== item.sellerUser
@@ -109,7 +112,7 @@ router.post("/notifications", ensureLoggedIn, async (req, res, next) => {
     const keys = { publicKey, privateKey };
     const response = await emailjs.send(
       serviceID,
-      templateID,
+      "template_d7gwxq9",
       templateParams,
       keys
     );

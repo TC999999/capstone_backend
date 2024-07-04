@@ -1,6 +1,6 @@
 const db = require("../db");
 const { NotFoundError } = require("../expressError");
-const { merge, mergeSort } = require("../helpers/mergeSort");
+const { merge } = require("../helpers/mergeSort");
 
 class Message {
   static async create({ from_username, to_username, item_id, body }) {

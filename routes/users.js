@@ -86,6 +86,28 @@ router.patch(
   }
 );
 
+router.patch(
+  "/:username/adminUpdate",
+  ensureAdmin,
+  async function (req, res, next) {
+    try {
+      const user = await User.update(req.params.username, req.body);
+      return res.json({ user });
+    } catch (err) {
+      return next(err);
+    }
+  }
+);
+
+// router.patch("/:username/flag", ensureAdmin, async function (req, res, next) {
+//   try {
+//     const user = await User.update(req.params.username, req.body);
+//     return res.json({ user });
+//   } catch (err) {
+//     return next(err);
+//   }
+// });
+
 router.delete(
   "/:username",
   ensureCorrectUserOrAdmin,

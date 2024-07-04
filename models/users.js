@@ -31,11 +31,10 @@ class User {
 
     const user = result.rows[0];
 
-    if (user.isFlagged) {
-      throw new UnauthorizedError("THIS ACCOUNT HAS BEEN FLAGGED!");
-    }
-
     if (user) {
+      if (user.isFlagged) {
+        throw new UnauthorizedError("THIS ACCOUNT HAS BEEN FLAGGED!");
+      }
       // compare hashed password to a new hash from password
       const isValid = await bcrypt.compare(password, user.password);
       if (isValid === true) {
