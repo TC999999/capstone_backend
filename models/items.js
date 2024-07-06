@@ -74,7 +74,8 @@ class Item {
     FROM items AS i
     JOIN users AS u
     ON i.seller_username=u.username
-    WHERE ${searchQuery} i.is_sold = false AND u.is_flagged = false`;
+    WHERE ${searchQuery} i.is_sold = false AND u.is_flagged = false
+    ORDER BY i.id DESC`;
 
     const results = await db.query(searchStr, values);
 

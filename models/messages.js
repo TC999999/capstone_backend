@@ -87,6 +87,7 @@ class Message {
                 m.from_username,
                 m.to_username,
                 i.name AS item_name,
+                i.id AS "itemID",
                 m.body,
                 m.sent_at
           FROM messages AS m
@@ -104,6 +105,7 @@ class Message {
                 m.from_username,
                 m.to_username,
                 i.name AS item_name,
+                i.id AS "itemID",
                 m.body,
                 m.sent_at
           FROM messages AS m
@@ -127,6 +129,7 @@ class Message {
                 m.from_username,
                 m.to_username,
                 i.name AS item_name,
+                i.id AS "itemID",
                 m.body,
                 m.sent_at
           FROM messages AS m
@@ -144,6 +147,7 @@ class Message {
                 m.from_username,
                 m.to_username,
                 i.name AS item_name,
+                i.id AS "itemID",
                 m.body,
                 m.sent_at
           FROM messages AS m

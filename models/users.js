@@ -307,6 +307,7 @@ class User {
         SELECT 
         id as "itemID",
         name,
+        image_url as "imageURL",
         initial_price AS "initialPrice",
         condition,
         description
@@ -491,7 +492,8 @@ class User {
             i.condition,
             i.description,
             u.city, 
-            u.region_or_state AS "regionOrState"
+            u.region_or_state AS "regionOrState",
+            u.country
         FROM 
             items AS i 
         JOIN 
