@@ -49,6 +49,21 @@ class Item {
     return item;
   }
 
+  static async addItemTypes(typeName) {
+    const duplicateCheck = await db.query(
+      `SELECT name FROM item_types WHERE name=$1`,
+      [typeName]
+    );
+    if (duplicateCheck.rows[0]) {
+      throw new BadRequestError(`Duplicate type: ${typeName}`);
+    }
+    const results = await db.query(
+      `INSERT INTO item_types (name) VALUES ($1)`,
+      [typeName]
+    );
+    return results.rows[0];
+  }
+
   static async addItemToTypes(itemID, typeIDArr) {
     let valStr = insertMultipleSQL(itemID, typeIDArr);
     await db.query(

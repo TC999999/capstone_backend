@@ -31,7 +31,7 @@ router.post("/", ensureAdmin, async function (req, res, next) {
   }
 });
 
-router.get("/", ensureLoggedIn, async function (req, res, next) {
+router.get("/", ensureAdmin, async function (req, res, next) {
   try {
     const users = await User.findAll();
     return res.json({ users });
@@ -98,15 +98,6 @@ router.patch(
     }
   }
 );
-
-// router.patch("/:username/flag", ensureAdmin, async function (req, res, next) {
-//   try {
-//     const user = await User.update(req.params.username, req.body);
-//     return res.json({ user });
-//   } catch (err) {
-//     return next(err);
-//   }
-// });
 
 router.delete(
   "/:username",

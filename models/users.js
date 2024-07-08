@@ -127,23 +127,21 @@ class User {
   }
 
   static async findAll() {
-    const result = await db.query(
+    const results = await db.query(
       `SELECT username,
                   first_name AS "firstName",
                   last_name AS "lastName",
                   email,
                   city,
                   region_or_state AS "regionOrState",
-                  country
+                  country,
+                  is_admin AS "isAdmin",
+                  is_flagged AS "isFlagged"
            FROM users
            ORDER BY username`
     );
-    let users = result.rows.map(async (val) => {
-      const reviews = await User.getReviews(val.username);
-      return { ...val, reviews };
-    });
 
-    users = await Promise.all(users);
+    let users = results.rows;
 
     return users;
   }

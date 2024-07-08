@@ -13,6 +13,7 @@ const { BadRequestError } = require("../expressError");
 const {
   ensureLoggedIn,
   ensureCorrectUserOrAdmin,
+  ensureAdmin,
 } = require("../middleware/auth");
 const Item = require("../models/items");
 
@@ -151,5 +152,15 @@ router.delete(
     }
   }
 );
+
+router.post("/types/new", ensureAdmin, async (req, res, next) => {
+  try {
+    let typeName = req.body.typeName;
+    const newType = await Item.addItemTypes(typeName);
+    return res.status(201).json({ newType });
+  } catch (err) {
+    return next(err);
+  }
+});
 
 module.exports = router;
