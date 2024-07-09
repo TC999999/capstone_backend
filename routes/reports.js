@@ -4,7 +4,11 @@ const express = require("express");
 const router = new express.Router();
 const { ensureAdmin, ensureLoggedIn } = require("../middleware/auth");
 const Report = require("../models/reports");
-const { UnauthorizedError, BadRequestError } = require("../expressError");
+const {
+  UnauthorizedError,
+  BadRequestError,
+  NotFoundError,
+} = require("../expressError");
 
 const newReportSchema = require("../schemas/reportNew.json");
 
@@ -21,6 +25,12 @@ router.get("/", ensureAdmin, async (req, res, next) => {
 router.get("/:id", ensureAdmin, async (req, res, next) => {
   try {
     const report = await Report.get(req.params.id);
+    if (
+      report.report.reportedUser === res.locals.user.username ||
+      report.report.reporterUser === res.locals.user.username
+    ) {
+      throw new UnauthorizedError("Can't view a report made by or for you");
+    }
     if (report) {
       return res.json(report);
     }
@@ -51,10 +61,22 @@ router.post("/", ensureLoggedIn, async (req, res, next) => {
 
 router.patch("/clear/:id", ensureAdmin, async (req, res, next) => {
   try {
+    const check = await Report.get(req.params.id);
+    if (!check) {
+      throw new NotFoundError();
+    }
+    if (
+      check.report.reportedUser === res.locals.user.username ||
+      check.report.reporterUser === res.locals.user.username
+    ) {
+      throw new UnauthorizedError("Can't clear a report made by or for you");
+    }
+
     const report = await Report.clearReport(req.params.id);
     if (report) {
       return res.json(report);
     }
+
     throw new UnauthorizedError();
   } catch (err) {
     return next(err);

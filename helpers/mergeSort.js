@@ -1,3 +1,5 @@
+//this function merges a message conversation between users in order from latest to earliest
+
 function merge(arr1, arr2) {
   const results = [];
   let i = 0;
@@ -22,12 +24,4 @@ function merge(arr1, arr2) {
   return results;
 }
 
-function mergeSort(arr) {
-  if (arr.length <= 1) return arr;
-  const mid = Math.floor(arr.length / 2);
-  const left = mergeSort(arr.slice(0, mid));
-  const right = mergeSort(arr.slice(mid));
-  return merge(left, right);
-}
-
-module.exports = { merge, mergeSort };
+module.exports = { merge };

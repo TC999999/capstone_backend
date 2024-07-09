@@ -82,6 +82,12 @@ function ensureCorrectUserOrAdmin(req, res, next) {
 
 function ensureCorrectUsers(req, res, next) {
   try {
+    if (!res.locals.user) {
+      throw new UnauthorizedError("Your account has been flagged");
+    }
+    if (res.locals.user.isFlagged) {
+      throw new UnauthorizedError("Your account has been flagged");
+    }
     if (
       res.locals.user.username !== req.params.userOne &&
       res.locals.user.username !== req.params.userTwo

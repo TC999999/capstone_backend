@@ -4,7 +4,7 @@ const {
   NotFoundError,
   BadRequestError,
   UnauthorizedError,
-} = require("../expressError");
+} = require("../expressError.js");
 const {
   sqlForPartialUpdate,
   selectMultipleTypes,
@@ -97,9 +97,6 @@ class User {
             first_name AS "firstName", 
             last_name AS "lastName", 
             email, 
-            city, 
-            region_or_state AS "regionOrState", 
-            country, 
             is_admin AS "isAdmin",
             is_flagged AS "isFlagged"`,
 
@@ -132,9 +129,6 @@ class User {
                   first_name AS "firstName",
                   last_name AS "lastName",
                   email,
-                  city,
-                  region_or_state AS "regionOrState",
-                  country,
                   is_admin AS "isAdmin",
                   is_flagged AS "isFlagged"
            FROM users
@@ -265,7 +259,7 @@ class User {
 
     await db.query(`UPDATE items SET is_sold = true WHERE id=$1`, [itemID]);
     let result = await db.query(
-      `INSERT INTO purchases (item_id, username, final_price, exchange_method, sale_made) VALUES ($1, $2, $3, $4, current_timestamp) RETURNING username, item_id AS itemID`,
+      `INSERT INTO purchases (item_id, username, final_price, exchange_method, sale_made) VALUES ($1, $2, $3, $4, current_timestamp) RETURNING username, item_id AS "itemID"`,
       [itemID, username, finalPrice, exchangeMethod]
     );
     const purchase = result.rows[0];

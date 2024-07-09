@@ -2,7 +2,6 @@ const db = require("../db");
 const { NotFoundError, BadRequestError } = require("../expressError");
 const { sqlForFilter } = require("../helpers/filter");
 const { sqlForPartialUpdate, insertMultipleSQL } = require("../helpers/sql");
-const User = require("./users.js");
 
 class Item {
   static async create({
@@ -58,7 +57,7 @@ class Item {
       throw new BadRequestError(`Duplicate type: ${typeName}`);
     }
     const results = await db.query(
-      `INSERT INTO item_types (name) VALUES ($1)`,
+      `INSERT INTO item_types (name) VALUES ($1) RETURNING name`,
       [typeName]
     );
     return results.rows[0];

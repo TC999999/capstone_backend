@@ -1,8 +1,14 @@
 const db = require("../db");
-const { NotFoundError } = require("../expressError");
+const { NotFoundError, BadRequestError } = require("../expressError");
+const User = require("./users.js");
 
 class Report {
   static async create({ reporterUsername, reportedUsername, body }) {
+    await User.get(reportedUsername);
+    await User.get(reporterUsername);
+    if (reportedUsername === reporterUsername) {
+      throw new BadRequestError();
+    }
     const result = await db.query(
       `INSERT INTO reports (
                     reporter_username,
@@ -22,6 +28,7 @@ class Report {
   }
 
   static async getAll(username) {
+    await User.get(username);
     const result = await db.query(
       `SELECT 
             r.id,  

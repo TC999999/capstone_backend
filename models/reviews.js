@@ -4,6 +4,8 @@ const User = require("./users");
 
 class Review {
   static async create({ reviewerUsername, reviewedUsername, rating, body }) {
+    await User.get(reviewedUsername);
+    await User.get(reviewerUsername);
     const dupRevCheckRes = await db.query(
       `SELECT
             reviewer_username,
@@ -65,6 +67,7 @@ class Review {
       `SELECT
             reviewer_username AS "reviewerUser",
             reviewed_username AS "reviewedUser",
+            rating,
             body,
             made_at AS "madeAt"
       FROM reviews

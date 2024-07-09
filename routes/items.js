@@ -9,7 +9,7 @@ const upload = multer({ storage: storage });
 const { supabase } = require("../config");
 const { decode } = require("base64-arraybuffer");
 
-const { BadRequestError } = require("../expressError");
+const { BadRequestError, UnauthorizedError } = require("../expressError");
 const {
   ensureLoggedIn,
   ensureCorrectUserOrAdmin,
@@ -125,6 +125,12 @@ router.patch(
   ensureCorrectUserOrAdmin,
   async (req, res, next) => {
     try {
+      if (!res.locals.user.isAdmin) {
+        const propCheck = await Item.findById(req.params.id);
+        if (propCheck.sellerUser !== res.locals.user.username) {
+          throw new UnauthorizedError("This item doesn't belong to you");
+        }
+      }
       const validator = jsonschema.validate(req.body, updateItemSchema);
       if (!validator.valid) {
         const errs = validator.errors.map((e) => {
@@ -145,6 +151,12 @@ router.delete(
   ensureCorrectUserOrAdmin,
   async (req, res, next) => {
     try {
+      if (!res.locals.user.isAdmin) {
+        const propCheck = await Item.findById(req.params.id);
+        if (propCheck.sellerUser !== res.locals.user.username) {
+          throw new UnauthorizedError("This item doesn't belong to you");
+        }
+      }
       await Item.delete(req.params.id);
       return res.json({ deleted: req.params.id });
     } catch (err) {
